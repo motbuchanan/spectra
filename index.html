@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Spectra — Sound You Can See</title>
+<link rel="manifest" href="./manifest.webmanifest" />
+<meta name="theme-color" content="#08080b" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Spectra" />
+<link rel="apple-touch-icon" href="./icon-180.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#08080b;
+    --bg2:#101016;
+    --panel:#13131a;
+    --panel2:#191921;
+    --line:#272730;
+    --ink:#ece9f0;
+    --muted:#8a8896;
+    --faint:#5a5866;
+    --gold:#e9b85a;
+    --gold-dim:#a07e3a;
+    --serif:'Fraunces',Georgia,'Times New Roman',serif;
+    --sans:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #16161f 0%, var(--bg) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    overflow:hidden;
+    position:fixed;width:100%;
+  }
+  body::after{ /* grain */
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.045;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  #app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto;position:relative;}
+
+  header{padding:18px 20px 10px;display:flex;align-items:flex-end;justify-content:space-between;}
+  .brand h1{font-family:var(--serif);font-weight:500;font-size:25px;letter-spacing:.5px;margin:0;line-height:1;}
+  .brand h1 em{font-style:italic;color:var(--gold);}
+  .brand p{margin:5px 0 0;font-size:11.5px;color:var(--muted);letter-spacing:.3px;}
+  .iconbtn{background:none;border:1px solid var(--line);color:var(--muted);font-family:var(--sans);
+    font-size:11px;padding:7px 11px;border-radius:20px;cursor:pointer;letter-spacing:.4px;}
+  .iconbtn:active{color:var(--ink);border-color:var(--faint);}
+
+  nav{display:flex;gap:4px;padding:6px 16px 10px;}
+  nav button{flex:1;background:none;border:none;color:var(--faint);font-family:var(--sans);
+    font-size:12px;font-weight:600;letter-spacing:.5px;padding:9px 0;cursor:pointer;border-radius:10px;
+    position:relative;transition:color .2s;text-transform:uppercase;}
+  nav button.active{color:var(--ink);}
+  nav button.active::after{content:"";position:absolute;left:28%;right:28%;bottom:2px;height:2px;
+    background:var(--gold);border-radius:2px;}
+
+  main{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 20px 30px;scrollbar-width:none;}
+  main::-webkit-scrollbar{display:none;}
+  .view{display:none;animation:fade .35s ease;}
+  .view.on{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* ---------- generic ---------- */
+  .lead{font-size:13.5px;color:var(--muted);line-height:1.55;margin:2px 0 16px;}
+  .lead b{color:var(--ink);font-weight:600;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;}
+  .btn-primary{display:block;width:100%;background:var(--gold);color:#1a1408;border:none;
+    font-family:var(--sans);font-weight:700;font-size:14px;letter-spacing:.4px;padding:15px;border-radius:14px;
+    cursor:pointer;}
+  .btn-primary:active{transform:scale(.99);}
+  .btn-ghost{display:block;width:100%;background:none;color:var(--muted);border:1px solid var(--line);
+    font-family:var(--sans);font-weight:600;font-size:13px;padding:13px;border-radius:13px;cursor:pointer;margin-top:10px;}
+
+  /* ---------- capture / session ---------- */
+  .sess-top{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 14px;}
+  .progress{font-size:11.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+  .pdots{display:flex;gap:5px;}
+  .pdots span{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .pdots span.done{background:var(--gold-dim);}
+  .pdots span.cur{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+
+  .stage{position:relative;height:230px;border-radius:20px;overflow:hidden;
+    background:radial-gradient(70% 70% at 50% 45%, #0d0d12 0%, #050507 100%);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+  .noteglyph{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--serif);
+    font-size:46px;color:rgba(255,255,255,.07);font-weight:500;pointer-events:none;user-select:none;}
+  .playbtn{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.5px;padding:9px 18px;border-radius:22px;
+    cursor:pointer;backdrop-filter:blur(4px);display:flex;align-items:center;gap:7px;}
+  .playbtn:active{background:rgba(255,255,255,.12);}
+  .playbtn .tri{width:0;height:0;border-left:8px solid var(--gold);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+
+  .field-label{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1.2px;margin:18px 2px 8px;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+    font-family:var(--sans);font-size:12.5px;padding:8px 13px;border-radius:11px;cursor:pointer;transition:.15s;}
+  .chip:active{transform:scale(.96);}
+  .chip.sel{background:rgba(233,184,90,.13);border-color:var(--gold);color:var(--ink);}
+
+  .colorrow{display:flex;gap:12px;align-items:center;}
+  .swatch{position:relative;width:54px;height:54px;border-radius:14px;overflow:hidden;border:1px solid var(--line);cursor:pointer;}
+  .swatch input{position:absolute;inset:-10px;width:200%;height:200%;border:none;cursor:pointer;background:none;}
+  .swatch .add{display:flex;align-items:center;justify-content:center;height:100%;color:var(--faint);font-size:22px;}
+  .colorrow .cinfo{font-size:11.5px;color:var(--muted);}
+  .clearc{background:none;border:none;color:var(--faint);font-size:11px;cursor:pointer;text-decoration:underline;padding:0;}
+
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:3px;background:var(--line);outline:none;margin-top:6px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:3px solid var(--bg);}
+
+  textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);
+    font-family:var(--sans);font-size:13px;padding:11px;resize:none;outline:none;}
+  textarea::placeholder{color:var(--faint);}
+
+  /* ---------- gallery ---------- */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;}
+  .gcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;}
+  .gstage{height:120px;position:relative;background:radial-gradient(60% 60% at 50% 50%,#0c0c11,#060608);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .gmeta{padding:9px 12px;display:flex;align-items:center;justify-content:space-between;}
+  .gmeta .gn{font-family:var(--serif);font-size:20px;}
+  .gmeta .gd{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;}
+  .empty{text-align:center;padding:40px 16px;color:var(--muted);}
+  .empty .big{font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:8px;}
+
+  /* ---------- consistency ---------- */
+  .idxcard{padding:22px;text-align:center;margin-bottom:16px;}
+  .idxnum{font-family:var(--serif);font-size:54px;line-height:1;color:var(--gold);}
+  .idxnum small{font-size:20px;color:var(--gold-dim);}
+  .idxlabel{font-size:12.5px;color:var(--muted);margin-top:6px;letter-spacing:.3px;}
+  .verdict{font-family:var(--serif);font-size:18px;margin-top:14px;}
+  .crow{display:flex;align-items:center;gap:13px;padding:12px 4px;border-bottom:1px solid var(--line);}
+  .crow:last-child{border-bottom:none;}
+  .cnote{font-family:var(--serif);font-size:24px;width:26px;text-align:center;flex-shrink:0;}
+  .cthumbs{display:flex;gap:6px;flex:1;}
+  .cthumb{width:42px;height:42px;border-radius:9px;background:#050507;border:1px solid var(--line);
+    position:relative;overflow:hidden;flex-shrink:0;}
+  .cscore{text-align:right;flex-shrink:0;width:74px;}
+  .cscore .pct{font-size:16px;font-weight:700;}
+  .cscore .word{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+  .note-research{font-size:12px;color:var(--muted);line-height:1.6;background:var(--panel2);
+    border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:18px;}
+  .note-research b{color:var(--gold);font-weight:600;}
+
+  .sesslist{margin-top:6px;}
+  .sessitem{display:flex;justify-content:space-between;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line);font-size:13px;}
+  .sessitem .d{color:var(--muted);}
+  .sessitem button{background:none;border:none;color:var(--faint);font-size:11px;cursor:pointer;text-decoration:underline;}
+
+  /* ===== VISUAL ENGINE ===== */
+  .vwrap{display:flex;align-items:center;justify-content:center;will-change:transform,opacity;}
+  .vshape{position:relative;}
+  /* movement (on wrapper) */
+  @keyframes m-rise{0%{transform:translateY(22%);opacity:.35}50%{opacity:1}100%{transform:translateY(-26%);opacity:0}}
+  @keyframes m-fall{0%{transform:translateY(-26%);opacity:.35}50%{opacity:1}100%{transform:translateY(26%);opacity:0}}
+  @keyframes m-left{0%{transform:translateX(28%)}50%{transform:translateX(-28%)}100%{transform:translateX(28%)}}
+  @keyframes m-right{0%{transform:translateX(-28%)}50%{transform:translateX(28%)}100%{transform:translateX(-28%)}}
+  @keyframes m-pulse{0%,100%{transform:scale(.86)}50%{transform:scale(1.12)}}
+  @keyframes m-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @keyframes m-shimmer{0%,100%{transform:translate(0,0)}25%{transform:translate(-2px,1px) rotate(-1.5deg)}75%{transform:translate(2px,-1px) rotate(1.5deg)}}
+  @keyframes m-expand{0%{transform:scale(.45);opacity:.4}80%{opacity:.9}100%{transform:scale(1.35);opacity:0}}
+  .mv-still .vwrap{animation:none}
+  .mv-rise .vwrap{animation:m-rise 2.6s ease-in-out infinite}
+  .mv-fall .vwrap{animation:m-fall 2.6s ease-in-out infinite}
+  .mv-left .vwrap{animation:m-left 3s ease-in-out infinite}
+  .mv-right .vwrap{animation:m-right 3s ease-in-out infinite}
+  .mv-pulse .vwrap{animation:m-pulse 1.8s ease-in-out infinite}
+  .mv-spin .vwrap{animation:m-spin 5s linear infinite}
+  .mv-shimmer .vwrap{animation:m-shimmer .28s linear infinite}
+  .mv-expand .vwrap{animation:m-expand 2.4s ease-out infinite}
+  /* light (on shape) */
+  @keyframes l-flick{0%,100%{opacity:1}48%{opacity:1}50%{opacity:.45}52%{opacity:1}70%{opacity:.7}72%{opacity:1}}
+  @keyframes l-spark{0%,100%{filter:brightness(1)}50%{filter:brightness(1.7) drop-shadow(0 0 6px #fff)}}
+  .lt-glow .vshape{filter:saturate(1.05)}
+  .lt-sharp .vshape{filter:contrast(1.15) saturate(1.2)}
+  .lt-flicker .vshape{animation:l-flick 2.2s steps(1,end) infinite}
+  .lt-steady .vshape{}
+  .lt-sparkle .vshape{animation:l-spark 1.3s ease-in-out infinite}
+  .lt-hazy .vshape{filter:blur(7px) saturate(1.1);opacity:.85}
+  .lt-bright .vshape{filter:brightness(1.45) saturate(1.25)}
+  .lt-dim .vshape{filter:brightness(.62) saturate(.85);opacity:.7}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <h1>Spectra<em>.</em></h1>
+      <p>Map the sound you see — and find out if it holds.</p>
+    </div>
+    <div style="display:flex;gap:7px;">
+    <button class="iconbtn" id="importBtn">Import</button>
+    <button class="iconbtn" id="exportBtn">Export</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none" />
+  </header>
+
+  <nav>
+    <button data-v="capture" class="active">Capture</button>
+    <button data-v="gallery">My Notes</button>
+    <button data-v="consistency">Consistency</button>
+  </nav>
+
+  <main>
+    <!-- ===== CAPTURE ===== -->
+    <section class="view on" id="v-capture">
+      <div id="cap-intro">
+        <p class="lead">A <b>session</b> plays all seven notes in random order. For each one, build what you see — color, shape, how it moves, how it's lit. Don't overthink it; match the feeling.<br><br>The real test is <b>doing this again on another day.</b> Come back tomorrow, do it blind, and the Consistency tab will tell you how stable your sound really is.</p>
+        <button class="btn-primary" id="startSess">Start a session</button>
+        <div id="lastsess" style="margin-top:14px;font-size:12px;color:var(--faint);text-align:center;"></div>
+      </div>
+
+      <div id="cap-flow" style="display:none;">
+        <div class="sess-top">
+          <span class="progress" id="progLabel">Note 1 of 7</span>
+          <div class="pdots" id="pdots"></div>
+        </div>
+
+        <div class="stage" id="capStage">
+          <div class="noteglyph" id="capGlyph">A</div>
+          <div id="capVisual"></div>
+          <button class="playbtn" id="capPlay"><span class="tri"></span> Play note</button>
+        </div>
+
+        <div class="field-label">Color</div>
+        <div class="colorrow">
+          <label class="swatch"><input type="color" id="col1" value="#76c7ff"></label>
+          <label class="swatch" id="sw2wrap"><div class="add" id="col2add">+</div><input type="color" id="col2" value="#bb6cff" style="display:none;"></label>
+          <div class="cinfo">
+            <div id="col2hint">Tap + if you see a second color</div>
+            <button class="clearc" id="col2clear" style="display:none;">remove 2nd color</button>
+          </div>
+        </div>
+
+        <div class="field-label">Shape / form</div>
+        <div class="chips" id="shapeChips"></div>
+
+        <div class="field-label">Movement — tap any that combine</div>
+        <div class="chips" id="moveChips"></div>
+
+        <div class="field-label">Light — tap any that combine</div>
+        <div class="chips" id="lightChips"></div>
+
+        <div class="field-label">Size</div>
+        <input type="range" id="sizeR" min="20" max="100" value="55">
+
+        <div class="field-label">Anything words can't catch (optional)</div>
+        <textarea id="noteText" rows="2" placeholder="e.g. it's warm, off to the left, feels like it leans..."></textarea>
+
+        <div style="height:18px;"></div>
+        <button class="btn-primary" id="nextBtn">Save &amp; next</button>
+        <button class="btn-ghost" id="cancelSess">Cancel session</button>
+      </div>
+    </section>
+
+    <!-- ===== GALLERY ===== -->
+    <section class="view" id="v-gallery">
+      <div id="galWrap"></div>
+    </section>
+
+    <!-- ===== CONSISTENCY ===== -->
+    <section class="view" id="v-consistency">
+      <div id="consWrap"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+const NOTES=[
+  {n:'C',f:261.63},{n:'D',f:293.66},{n:'E',f:329.63},
+  {n:'F',f:349.23},{n:'G',f:392.00},{n:'A',f:440.00},{n:'B',f:493.88}
+];
+const SHAPES=['Field','Orb','Dot','Blob','Bar','Ring','Spike','Block','Star','Wave'];
+const MOVES=['Rising','Falling','Drift left','Drift right','Pulse','Spin','Shimmer','Expand'];
+const LIGHTS=['Glow','Sharp','Flicker','Sparkle','Hazy','Bright','Dim'];
+const MOVE_ANIM={
+  'Rising':'m-rise 2.6s ease-in-out infinite',
+  'Falling':'m-fall 2.6s ease-in-out infinite',
+  'Drift left':'m-left 3s ease-in-out infinite',
+  'Drift right':'m-right 3s ease-in-out infinite',
+  'Pulse':'m-pulse 1.8s ease-in-out infinite',
+  'Spin':'m-spin 5s linear infinite',
+  'Shimmer':'m-shimmer .28s linear infinite',
+  'Expand':'m-expand 2.4s ease-out infinite'
+};
+function getMoves(s){return Array.isArray(s.moves)?s.moves:(s.move?[s.move]:[]);}
+function getLights(s){return Array.isArray(s.lights)?s.lights:(s.light?[s.light]:[]);}
+function lightSpec(name,color,scale){
+  const c=color||'#ffffff';
+  switch(name){
+    case 'Glow': return {filter:`drop-shadow(0 0 ${14*scale}px ${c}) saturate(1.05)`};
+    case 'Sharp': return {filter:'contrast(1.15) saturate(1.25)'};
+    case 'Flicker': return {anim:'l-flick 2.2s steps(1,end) infinite'};
+    case 'Sparkle': return {anim:'l-spark 1.3s ease-in-out infinite'};
+    case 'Hazy': return {filter:`blur(${5*scale}px) saturate(1.1)`,opacity:0.85};
+    case 'Bright': return {filter:'brightness(1.45) saturate(1.25)'};
+    case 'Dim': return {filter:'brightness(.62) saturate(.85)',opacity:0.7};
+    default: return {};
+  }
+}
+
+const STORE_KEY='spectra:sessions:v1';
+let sessions=[];
+
+const storage={
+  async load(){
+    try{const v=localStorage.getItem(STORE_KEY);return v?JSON.parse(v):[];}
+    catch(e){return [];}
+  },
+  async save(d){
+    try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}
+    catch(e){alert('Could not save to this device. If you are in Private Browsing, switch to a normal tab.');}
+  }
+};
+
+/* ---------------- audio ---------------- */
+let actx=null;
+function ensureAudio(){if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();}if(actx.state==='suspended')actx.resume();}
+function playNote(freq){
+  ensureAudio();
+  const t=actx.currentTime, dur=1.3;
+  const master=actx.createGain();
+  master.gain.setValueAtTime(0,t);
+  master.gain.linearRampToValueAtTime(0.32,t+0.02);
+  master.gain.linearRampToValueAtTime(0.22,t+0.25);
+  master.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  master.connect(actx.destination);
+  // warm tone: fundamental triangle + soft octave + faint fifth
+  const parts=[[freq,'triangle',1.0],[freq*2,'sine',0.28],[freq*3,'sine',0.12]];
+  parts.forEach(([fr,type,g])=>{
+    const o=actx.createOscillator(),gn=actx.createGain();
+    o.type=type;o.frequency.value=fr;gn.gain.value=g;
+    o.connect(gn);gn.connect(master);o.start(t);o.stop(t+dur+0.05);
+  });
+}
+
+/* ---------------- visual engine ---------------- */
+function shapeStyle(shape,colA,colB,px){
+  const fill = colB ? `linear-gradient(135deg, ${colA}, ${colB})` : colA;
+  const radial = colB ? `radial-gradient(circle at 35% 30%, ${colB}, ${colA} 75%)` : `radial-gradient(circle at 35% 30%, ${colA}, ${shade(colA,-30)} 80%)`;
+  const s={width:px+'px',height:px+'px',background:fill,borderRadius:'0'};
+  switch(shape){
+    case 'Field': return {width:(px*1.7)+'px',height:(px*1.7)+'px',background:`radial-gradient(circle, ${colA} 0%, ${colB||colA} 35%, transparent 70%)`,borderRadius:'50%',filter:'blur(2px)'};
+    case 'Orb': return {width:px+'px',height:px+'px',background:radial,borderRadius:'50%',boxShadow:`0 0 ${px*0.5}px ${colA}66`};
+    case 'Dot': return {width:(px*0.45)+'px',height:(px*0.45)+'px',background:radial,borderRadius:'50%',boxShadow:`0 0 ${px*0.4}px ${colA}88`};
+    case 'Blob': return {width:px+'px',height:(px*0.9)+'px',background:radial,borderRadius:'62% 38% 55% 45% / 55% 48% 52% 45%'};
+    case 'Bar': return {width:(px*0.34)+'px',height:(px*1.5)+'px',background:fill,borderRadius:px+'px',boxShadow:`0 0 ${px*0.35}px ${colA}55`};
+    case 'Ring': return {width:px+'px',height:px+'px',background:'transparent',borderRadius:'50%',border:`${Math.max(5,px*0.13)}px solid ${colA}`,boxShadow:`0 0 ${px*0.4}px ${colA}66, inset 0 0 ${px*0.25}px ${colA}55`};
+    case 'Spike': return {width:px+'px',height:px+'px',background:fill,clipPath:'polygon(50% 0,100% 100%,0 100%)'};
+    case 'Block': return {width:(px*0.92)+'px',height:(px*0.92)+'px',background:fill,borderRadius:Math.max(4,px*0.08)+'px',boxShadow:`0 0 ${px*0.3}px ${colA}44`};
+    case 'Star': return {width:px+'px',height:px+'px',background:fill,clipPath:'polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)',filter:`drop-shadow(0 0 ${px*0.2}px ${colA}aa)`};
+    case 'Wave': return {width:(px*1.6)+'px',height:(px*0.3)+'px',background:fill,borderRadius:px+'px',boxShadow:`0 0 ${px*0.3}px ${colA}66`};
+    default: return s;
+  }
+}
+function shade(hex,amt){
+  const c=hexRgb(hex);if(!c)return hex;
+  const f=v=>Math.max(0,Math.min(255,Math.round(v+amt)));
+  return '#'+[f(c.r),f(c.g),f(c.b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function renderVisual(container,spec,scale){
+  scale=scale||1;
+  const px=(spec.size||55)*scale;
+  container.className='';
+  container.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;';
+  container.innerHTML='';
+  const shape=document.createElement('div');shape.className='vshape';
+  Object.assign(shape.style,shapeStyle(spec.shape||'Orb',spec.color||'#76c7ff',spec.color2||null,px));
+  let node=shape;
+  // light layers nest around the shape (filters compose through nesting)
+  getLights(spec).forEach(l=>{
+    const sp=lightSpec(l,spec.color,scale);
+    const layer=document.createElement('div');
+    layer.style.display='inline-flex';layer.style.alignItems='center';layer.style.justifyContent='center';
+    if(sp.filter)layer.style.filter=sp.filter;
+    if(sp.opacity!=null)layer.style.opacity=sp.opacity;
+    if(sp.anim)layer.style.animation=sp.anim;
+    layer.appendChild(node);node=layer;
+  });
+  // movement layers nest outside (transforms compose through nesting)
+  getMoves(spec).filter(m=>MOVE_ANIM[m]).forEach(m=>{
+    const layer=document.createElement('div');
+    layer.style.display='inline-flex';layer.style.alignItems='center';layer.style.justifyContent='center';
+    layer.style.willChange='transform,opacity';
+    layer.style.animation=MOVE_ANIM[m];
+    layer.appendChild(node);node=layer;
+  });
+  container.appendChild(node);
+}
+
+/* ---------------- color distance (redmean) ---------------- */
+function hexRgb(h){const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return m?{r:+('0x'+m[1]),g:+('0x'+m[2]),b:+('0x'+m[3])}:null;}
+function colorSim(a,b){
+  const c1=hexRgb(a),c2=hexRgb(b);if(!c1||!c2)return a===b?1:0;
+  const rm=(c1.r+c2.r)/2,dr=c1.r-c2.r,dg=c1.g-c2.g,db=c1.b-c2.b;
+  const d=Math.sqrt((2+rm/256)*dr*dr+4*dg*dg+(2+(255-rm)/256)*db*db);
+  return Math.max(0,1-d/520);
+}
+function setSim(a,b){
+  a=a||[];b=b||[];
+  if(a.length===0&&b.length===0)return 1;
+  const B=new Set(b);let inter=0;a.forEach(x=>{if(B.has(x))inter++;});
+  const uni=new Set([...a,...b]).size;
+  return uni?inter/uni:1;
+}
+function respSim(a,b){
+  if(!a||!b)return 0;
+  let s=colorSim(a.color,b.color)*0.40;
+  s+=(a.shape===b.shape?1:0)*0.25;
+  s+=setSim(getMoves(a),getMoves(b))*0.20;
+  s+=setSim(getLights(a),getLights(b))*0.15;
+  return s;
+}
+
+/* ---------------- session capture ---------------- */
+let draft=null; // {order, idx, resp, spec}
+function freshSpec(){return {color:'#76c7ff',color2:null,shape:null,moves:[],lights:[],size:55,text:''};}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildChips(){
+  const single=(host,arr)=>{
+    const el=document.getElementById(host);el.innerHTML='';
+    arr.forEach(v=>{
+      const c=document.createElement('button');c.className='chip';c.textContent=v;
+      c.onclick=()=>{draft.spec.shape=v;[...el.children].forEach(x=>x.classList.remove('sel'));c.classList.add('sel');updatePreview();};
+      el.appendChild(c);
+    });
+  };
+  const multi=(host,arr,key)=>{
+    const el=document.getElementById(host);el.innerHTML='';
+    arr.forEach(v=>{
+      const c=document.createElement('button');c.className='chip';c.textContent=v;
+      c.onclick=()=>{
+        const list=draft.spec[key];const i=list.indexOf(v);
+        if(i>=0)list.splice(i,1);else list.push(v);
+        c.classList.toggle('sel');updatePreview();
+      };
+      el.appendChild(c);
+    });
+  };
+  single('shapeChips',SHAPES);
+  multi('moveChips',MOVES,'moves');
+  multi('lightChips',LIGHTS,'lights');
+}
+function syncChipSel(){
+  [...document.getElementById('shapeChips').children].forEach(c=>c.classList.toggle('sel',c.textContent===draft.spec.shape));
+  [...document.getElementById('moveChips').children].forEach(c=>c.classList.toggle('sel',draft.spec.moves.includes(c.textContent)));
+  [...document.getElementById('lightChips').children].forEach(c=>c.classList.toggle('sel',draft.spec.lights.includes(c.textContent)));
+}
+function updatePreview(){
+  renderVisual(document.getElementById('capVisual'),draft.spec,1);
+  document.getElementById('nextBtn').style.opacity=draft.spec.shape?1:0.45;
+}
+function loadStep(){
+  const note=draft.order[draft.idx];
+  document.getElementById('capGlyph').textContent=note;
+  document.getElementById('progLabel').textContent=`Note ${draft.idx+1} of ${draft.order.length}`;
+  // reset controls
+  draft.spec=freshSpec();
+  document.getElementById('col1').value=draft.spec.color;
+  document.getElementById('col2').style.display='none';
+  document.getElementById('col2add').style.display='flex';
+  document.getElementById('col2clear').style.display='none';
+  document.getElementById('col2hint').style.display='block';
+  document.getElementById('sizeR').value=draft.spec.size;
+  document.getElementById('noteText').value='';
+  syncChipSel();updatePreview();renderDots();
+  document.getElementById('nextBtn').textContent = draft.idx===draft.order.length-1?'Finish session':'Save & next';
+  playNote(NOTES.find(x=>x.n===note).f);
+}
+function renderDots(){
+  const d=document.getElementById('pdots');d.innerHTML='';
+  draft.order.forEach((_,i)=>{const s=document.createElement('span');
+    if(i<draft.idx)s.className='done';if(i===draft.idx)s.className='cur';d.appendChild(s);});
+}
+function startSession(){
+  draft={order:shuffle(NOTES.map(x=>x.n)),idx:0,resp:{},spec:freshSpec()};
+  document.getElementById('cap-intro').style.display='none';
+  document.getElementById('cap-flow').style.display='block';
+  buildChips();loadStep();
+}
+async function saveStep(){
+  if(!draft.spec.shape)return;
+  const note=draft.order[draft.idx];
+  draft.spec.text=document.getElementById('noteText').value.trim();
+  draft.resp[note]={...draft.spec,moves:[...draft.spec.moves],lights:[...draft.spec.lights]};
+  if(draft.idx<draft.order.length-1){draft.idx++;document.getElementById('main')&&0;loadStep();
+    document.querySelector('main').scrollTo({top:0,behavior:'smooth'});}
+  else{
+    sessions.push({id:Date.now(),date:new Date().toISOString(),resp:draft.resp});
+    await storage.save(sessions);
+    draft=null;
+    document.getElementById('cap-flow').style.display='none';
+    document.getElementById('cap-intro').style.display='block';
+    refreshIntro();
+    switchView('gallery');
+  }
+}
+function refreshIntro(){
+  const el=document.getElementById('lastsess');
+  if(sessions.length===0){el.textContent='No sessions yet.';return;}
+  const last=sessions[sessions.length-1];
+  const days= Math.floor((Date.now()-new Date(last.date))/86400000);
+  el.innerHTML=`${sessions.length} session${sessions.length>1?'s':''} saved · last one ${days===0?'today':days+' day'+(days>1?'s':'')+' ago'}`
+    + (sessions.length<2?'<br><span style="color:var(--gold-dim)">Do another on a different day to test consistency.</span>':'');
+}
+
+/* ---------------- gallery ---------------- */
+function latestFor(note){
+  for(let i=sessions.length-1;i>=0;i--){if(sessions[i].resp[note])return sessions[i].resp[note];}
+  return null;
+}
+function renderGallery(){
+  const w=document.getElementById('galWrap');
+  if(sessions.length===0){
+    w.innerHTML=`<div class="empty"><div class="big">Nothing mapped yet</div>Run a capture session and your seven notes will appear here — each one alive in the color, shape and motion you gave it. Tap any to hear it.</div>`;
+    return;
+  }
+  w.innerHTML='<p class="lead">Your sound, made visible. Tap a card to <b>hear the note</b> and watch what you saw. This updates to your most recent session.</p><div class="grid" id="ggrid"></div>';
+  const g=document.getElementById('ggrid');
+  NOTES.forEach(N=>{
+    const spec=latestFor(N.n);
+    const card=document.createElement('div');card.className='gcard';
+    const stage=document.createElement('div');stage.className='gstage';
+    const vis=document.createElement('div');stage.appendChild(vis);
+    card.appendChild(stage);
+    const meta=document.createElement('div');meta.className='gmeta';
+    meta.innerHTML=`<span class="gn">${N.n}</span><span class="gd">${spec?(spec.shape):'—'}</span>`;
+    card.appendChild(meta);
+    g.appendChild(card);
+    if(spec)renderVisual(vis,spec,0.9); else stage.innerHTML='<span style="color:var(--faint);font-size:11px">not captured</span>';
+    card.onclick=()=>{playNote(N.f);stage.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:400});};
+  });
+}
+
+/* ---------------- consistency ---------------- */
+function renderConsistency(){
+  const w=document.getElementById('consWrap');
+  if(sessions.length<2){
+    w.innerHTML=`<div class="empty"><div class="big">Need a second session</div>You've done ${sessions.length} of 2. Consistency is the gap between sessions — come back on another day, capture the notes again <i>without peeking here</i>, and I'll measure how closely the two line up.</div>
+    <div class="note-research"><b>Why the wait matters.</b> Anyone can repeat themselves five minutes later. Genuine synesthesia shows up as agreement across days, weeks, even months — that durability is the signal researchers actually look for.</div>`;
+    if(sessions.length===1) renderSessionList(w);
+    return;
+  }
+  // per-note avg pairwise similarity across sessions that have that note
+  const perNote=[];let total=0,tcount=0;
+  NOTES.forEach(N=>{
+    const specs=sessions.filter(s=>s.resp[N.n]).map(s=>s.resp[N.n]);
+    if(specs.length<2){perNote.push({note:N.n,score:null,specs});return;}
+    let sum=0,c=0;
+    for(let i=0;i<specs.length;i++)for(let j=i+1;j<specs.length;j++){sum+=respSim(specs[i],specs[j]);c++;}
+    const sc=sum/c;perNote.push({note:N.n,score:sc,specs});total+=sc;tcount++;
+  });
+  const overall=tcount?Math.round(total/tcount*100):0;
+  const v=verdict(overall);
+  let html=`<div class="card idxcard"><div class="idxnum">${overall}<small>%</small></div>
+    <div class="idxlabel">overall consistency across ${sessions.length} sessions</div>
+    <div class="verdict" style="color:${v.color}">${v.label}</div></div>`;
+  html+='<div class="card" style="padding:6px 16px;">';
+  perNote.forEach(p=>{
+    html+=`<div class="crow"><div class="cnote">${p.note}</div><div class="cthumbs" id="th-${p.note}"></div>`;
+    if(p.score===null){html+=`<div class="cscore"><div class="word" style="color:var(--faint)">1 session</div></div></div>`;}
+    else{const pc=Math.round(p.score*100);const vv=verdict(pc);
+      html+=`<div class="cscore"><div class="pct" style="color:${vv.color}">${pc}%</div><div class="word">${vv.short}</div></div></div>`;}
+  });
+  html+='</div>';
+  html+=`<div class="note-research"><b>Reading this.</b> The score blends how close your color is plus whether shape, motion and light matched. People with real synesthesia tend to land high here even with days between sessions — far higher than chance. A low score isn't failure; it can mean the percept shifts with mood, context, or that this note is genuinely less fixed than others.</div>`;
+  w.innerHTML=html;
+  perNote.forEach(p=>{
+    const host=document.getElementById('th-'+p.note);
+    p.specs.slice(-4).forEach(spec=>{const t=document.createElement('div');t.className='cthumb';
+      const inner=document.createElement('div');t.appendChild(inner);host.appendChild(t);
+      renderVisual(inner,spec,0.34);});
+  });
+  renderSessionList(w);
+}
+function verdict(pct){
+  if(pct>=85)return{label:'Strikingly consistent',short:'rock solid',color:'#7be0a4'};
+  if(pct>=70)return{label:'Fairly consistent',short:'holding',color:'#e9b85a'};
+  if(pct>=50)return{label:'Mixed — some notes drift',short:'mixed',color:'#e9955a'};
+  return{label:'Quite variable so far',short:'shifting',color:'#e07b7b'};
+}
+function renderSessionList(w){
+  if(sessions.length===0)return;
+  const div=document.createElement('div');div.style.marginTop='20px';
+  div.innerHTML='<div class="field-label" style="margin-left:0">Sessions</div><div class="sesslist" id="slist"></div>';
+  w.appendChild(div);
+  const sl=div.querySelector('#slist');
+  sessions.slice().reverse().forEach(s=>{
+    const d=new Date(s.date);
+    const item=document.createElement('div');item.className='sessitem';
+    item.innerHTML=`<span class="d">${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span>`;
+    const del=document.createElement('button');del.textContent='delete';
+    del.onclick=async()=>{sessions=sessions.filter(x=>x.id!==s.id);await storage.save(sessions);renderConsistency();renderGallery();refreshIntro();};
+    item.appendChild(del);sl.appendChild(item);
+  });
+}
+
+/* ---------------- nav + boot ---------------- */
+function switchView(v){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('on'));
+  document.getElementById('v-'+v).classList.add('on');
+  document.querySelector('main').scrollTo({top:0});
+  if(v==='gallery')renderGallery();
+  if(v==='consistency')renderConsistency();
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  if(draft && b.dataset.v!=='capture'){ if(!confirm('Leave this session? Progress so far is not saved.'))return; draft=null;
+    document.getElementById('cap-flow').style.display='none';document.getElementById('cap-intro').style.display='block';refreshIntro();}
+  switchView(b.dataset.v);
+});
+
+document.getElementById('startSess').onclick=()=>{ensureAudio();startSession();};
+document.getElementById('capPlay').onclick=()=>{if(draft)playNote(NOTES.find(x=>x.n===draft.order[draft.idx]).f);};
+document.getElementById('nextBtn').onclick=saveStep;
+document.getElementById('cancelSess').onclick=()=>{draft=null;
+  document.getElementById('cap-flow').style.display='none';document.getElementById('cap-intro').style.display='block';refreshIntro();};
+
+document.getElementById('col1').oninput=e=>{draft.spec.color=e.target.value;updatePreview();};
+document.getElementById('col2add').onclick=()=>{
+  document.getElementById('col2add').style.display='none';
+  const c2=document.getElementById('col2');c2.style.display='block';
+  draft.spec.color2=c2.value;document.getElementById('col2clear').style.display='inline';
+  document.getElementById('col2hint').style.display='none';updatePreview();};
+document.getElementById('col2').oninput=e=>{draft.spec.color2=e.target.value;updatePreview();};
+document.getElementById('col2clear').onclick=()=>{draft.spec.color2=null;
+  document.getElementById('col2').style.display='none';document.getElementById('col2add').style.display='flex';
+  document.getElementById('col2clear').style.display='none';document.getElementById('col2hint').style.display='block';updatePreview();};
+document.getElementById('sizeR').oninput=e=>{draft.spec.size=+e.target.value;updatePreview();};
+
+document.getElementById('exportBtn').onclick=()=>{
+  const blob=new Blob([JSON.stringify(sessions,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='spectra-data-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+};
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!Array.isArray(data))throw 0;
+      const have=new Set(sessions.map(s=>s.id));
+      const added=data.filter(s=>s&&s.id&&!have.has(s.id));
+      if(added.length===0){alert('Nothing new to import — those sessions are already here.');}
+      else{
+        sessions=sessions.concat(added).sort((a,b)=>new Date(a.date)-new Date(b.date));
+        await storage.save(sessions);refreshIntro();renderGallery();
+        alert('Imported '+added.length+' session'+(added.length>1?'s':'')+'.');
+      }
+    }catch(err){alert('That file did not look like a Spectra backup.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
+};
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+(async function boot(){
+  if(navigator.storage&&navigator.storage.persist){try{await navigator.storage.persist();}catch(e){}}
+  sessions=await storage.load();
+  refreshIntro();
+})();
+</script>
+</body>
+</html>
