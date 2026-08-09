@@ -1,5 +1,5 @@
 /* Spectra service worker */
-const CACHE = 'spectra-v1';
+const CACHE = 'spectra-v2';
 const SHELL = [
   './',
   './index.html',
@@ -25,7 +25,6 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // Google Fonts: stale-while-revalidate so the app looks right offline after first load
   if (url.host.includes('fonts.googleapis.com') || url.host.includes('fonts.gstatic.com')) {
     e.respondWith(
       caches.open(CACHE).then(async cache => {
@@ -37,8 +36,12 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // App shell: cache-first, fall back to network, then to the cached index for navigations
-  e.respondWith(
-    caches.match(req).then(hit => hit || fetch(req).catch(() => caches.match('./index.html')))
-  );
+  // App shell: network-first for index (so new builds land), cache-first for the rest
+  if (req.mode === 'navigate' || url.pathname.endsWith('index.html') || url.pathname.endsWith('/')) {
+    e.respondWith(fetch(req).then(res => {
+      const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return res;
+    }).catch(() => caches.match(req).then(h => h || caches.match('./index.html'))));
+    return;
+  }
+  e.respondWith(caches.match(req).then(hit => hit || fetch(req)));
 });
