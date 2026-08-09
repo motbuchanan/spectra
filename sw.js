@@ -1,5 +1,5 @@
 /* Spectra service worker */
-const CACHE = 'spectra-v2-2';
+const CACHE = 'spectra-v2-3';
 const SHELL = [
   './',
   './index.html',

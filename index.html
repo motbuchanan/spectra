@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="build" content="v2.2 · Aug 9" />
-<title>Spectra — Sound You Can See</title>
+<meta name="build" content="v2.3 · Aug 9" />
+<title>Spectra · Sound You Can See</title>
 <link rel="manifest" href="./manifest.webmanifest" />
 <meta name="theme-color" content="#08080b" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -37,10 +37,12 @@
   .brand h1{font-family:var(--serif);font-weight:500;font-size:24px;letter-spacing:.5px;margin:0;line-height:1;}
   .brand h1 em{font-style:italic;color:var(--gold);}
   .brand p{margin:5px 0 0;font-size:11.5px;color:var(--muted);letter-spacing:.3px;}
-  .hbtns{display:flex;gap:7px;align-items:center;}
+  .hbtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
   .iconbtn{background:none;border:1px solid var(--line);color:var(--muted);font-family:var(--sans);
-    font-size:11px;padding:7px 11px;border-radius:20px;cursor:pointer;letter-spacing:.4px;}
+    font-size:11px;padding:7px 10px;border-radius:20px;cursor:pointer;letter-spacing:.3px;white-space:nowrap;}
   .iconbtn:active{color:var(--ink);border-color:var(--faint);transform:scale(.96);}
+  .guidebtn{color:var(--gold);border-color:var(--gold-dim);font-weight:600;}
+  .guidebtn:active{color:var(--gold);border-color:var(--gold);}
   .help-btn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:50%;width:30px;height:30px;font-size:13px;cursor:pointer;flex-shrink:0;}
   .help-btn:active{transform:scale(.94);}
 
@@ -189,6 +191,7 @@
   /* onboarding / guide */
   #onboard{justify-content:center;}
   .ob-card{max-width:442px;margin:auto;text-align:center;padding:16px 24px;}
+  .ob-eyebrow{font-size:10.5px;letter-spacing:2.4px;text-transform:uppercase;color:var(--gold-dim);margin-bottom:12px;}
   .ob-hero{height:172px;position:relative;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;}
   .ob-hero>*{width:100%;}
   .ob-glyphlabel{position:absolute;top:8px;left:0;right:0;text-align:center;font-family:var(--serif);font-size:34px;color:rgba(210,222,255,.09);text-shadow:0 0 30px rgba(150,180,255,.14);z-index:1;pointer-events:none;}
@@ -354,7 +357,7 @@
       <p>Map the sound you see.</p>
     </div>
     <div class="hbtns">
-      <button class="help-btn" id="helpBtn" title="How it works">?</button>
+      <button class="iconbtn guidebtn" id="helpBtn">Guide</button>
       <button class="iconbtn" id="importBtn">Import</button>
       <button class="iconbtn" id="exportBtn">Export</button>
     </div>
@@ -372,8 +375,9 @@
     <!-- CAPTURE -->
     <section class="view on" id="v-capture">
       <div id="cap-intro">
-        <p class="lead">A <b>session</b> plays all seven notes in random order. For each, build what you see — color, shape, movement, light. Match the feeling, don't overthink it.<br><br>The real test is <b>doing this again on another day</b>, blind. Calendar and Insights then show whether your sound holds.</p>
+        <p class="lead">A <b>session</b> plays all seven notes in random order. For each, build what you see: color, shape, movement, light. Match the feeling, don't overthink it.<br><br>The real test is <b>doing this again on another day</b>, blind. Calendar and Insights then show whether your sound holds.</p>
         <button class="btn-primary" id="startSess">Start a session</button>
+        <button class="btn-ghost" id="tourBtn">New here? Take the quick tour</button>
         <div id="lastsess" style="margin-top:14px;font-size:12px;color:var(--faint);text-align:center;"></div>
       </div>
 
@@ -398,9 +402,9 @@
         </div>
         <div class="field-label">Shape / form</div>
         <div class="chips" id="shapeChips"></div>
-        <div class="field-label">Movement — tap any that combine</div>
+        <div class="field-label">Movement, tap any that combine</div>
         <div class="chips" id="moveChips"></div>
-        <div class="field-label">Light — tap any that combine</div>
+        <div class="field-label">Light, tap any that combine</div>
         <div class="chips" id="lightChips"></div>
         <div class="field-label">Size</div>
         <input type="range" id="sizeR" min="20" max="100" value="55">
@@ -439,6 +443,7 @@
 <!-- GUIDE -->
 <div class="overlay" id="onboard">
   <div class="ob-card">
+    <div class="ob-eyebrow">Quick tour</div>
     <div class="ob-hero" id="obHero"></div>
     <h2 class="ob-title" id="obTitle"></h2>
     <p class="ob-text" id="obText"></p>
@@ -479,7 +484,7 @@
   </div>
   <div class="ov-body">
     <div class="mel-stage" id="melStage"><div class="mel-glyph" id="melGlyph"></div><div id="melVisual"></div></div>
-    <p class="lead" id="melHint">Pick a tune. Each note fires the visual you captured for it, in rhythm. This doesn't test anything — it's the part that makes people get it.</p>
+    <p class="lead" id="melHint">Pick a tune. Each note fires the visual you captured for it, in rhythm. This doesn't test anything. It's the part that makes people get it.</p>
     <div id="melTunes"></div>
   </div>
 </div>
@@ -710,7 +715,7 @@ async function saveStep(){
     const resp=draft.resp;
     sessions.push({id:Date.now(),date:new Date().toISOString(),resp});
     await storage.save();draft=null;endFlowUI();refreshIntro();
-    if(!STORAGE_OK){exportData();toast('Storage here is unsafe — saved to a file instead.');}
+    if(!STORAGE_OK){exportData();toast('Storage here is unsafe, saved to a file instead.');}
     showComplete(resp);
   }
 }
@@ -752,7 +757,7 @@ function allFor(note){const out=[];sessions.forEach(s=>{if(s.resp[note])out.push
 function renderGallery(){
   const w=document.getElementById('galWrap');
   if(sessions.length===0){w.innerHTML=`<div class="empty"><div class="big">Nothing mapped yet</div>Run a capture session and your seven notes appear here. Tap any to open it.</div>`;return;}
-  w.innerHTML='<div class="subhead"><p class="lead" style="margin:0;flex:1">Tap a note to open its reference view — every capture, overlaid and over time.</p><button class="iconbtn" id="melBtn" style="flex-shrink:0">Melody</button></div><div class="grid" id="ggrid"></div>';
+  w.innerHTML='<div class="subhead"><p class="lead" style="margin:0;flex:1">Tap a note to open its reference view: every capture, overlaid and over time.</p><button class="iconbtn" id="melBtn" style="flex-shrink:0">Melody</button></div><div class="grid" id="ggrid"></div>';
   document.getElementById('melBtn').onclick=openMelody;
   const g=document.getElementById('ggrid');
   NOTES.forEach(N=>{
@@ -761,7 +766,7 @@ function renderGallery(){
     const stage=document.createElement('div');stage.className='gstage';
     const vis=document.createElement('div');stage.appendChild(vis);card.appendChild(stage);
     const meta=document.createElement('div');meta.className='gmeta';
-    meta.innerHTML=`<span class="gn">${N.n}</span><span class="gd">${spec?escapeHtml(spec.shape):'—'}</span>`;
+    meta.innerHTML=`<span class="gn">${N.n}</span><span class="gd">${spec?escapeHtml(spec.shape):'\u00b7'}</span>`;
     card.appendChild(meta);g.appendChild(card);
     if(spec)renderVisual(vis,spec,0.9);else stage.innerHTML='<span style="color:var(--faint);font-size:11px">not captured</span>';
     card.onclick=()=>openNote(N.n);
@@ -812,7 +817,7 @@ function renderND(){
       item.appendChild(sim);row.appendChild(item);renderVisual(vis,cap.spec,0.82);
     });
     c.appendChild(row);
-    const h=document.createElement('div');h.className='nd-hint';h.textContent='Each capture scored against your first ("anchor") — is '+ndNote+' the same as it always was?';c.appendChild(h);
+    const h=document.createElement('div');h.className='nd-hint';h.textContent='Each capture scored against your first ("anchor"). Is '+ndNote+' the same as it always was?';c.appendChild(h);
   }
 }
 
@@ -820,7 +825,7 @@ function renderND(){
 let calMode='month', calView=new Date();
 function renderCalendar(){
   const w=document.getElementById('calWrap');
-  if(sessions.length===0){w.innerHTML=`<div class="empty"><div class="big">No sessions to chart</div>Once you capture on a few days, this fills in — a spectrum for each day, and colored ribbons you can scan down for drift.</div>`;return;}
+  if(sessions.length===0){w.innerHTML=`<div class="empty"><div class="big">No sessions to chart</div>Once you capture on a few days, this fills in: a spectrum for each day, and colored ribbons you can scan down for drift.</div>`;return;}
   if(calMode==='month')renderMonth(w);else renderRibbon(w);
 }
 function renderMonth(w){
@@ -859,7 +864,7 @@ function renderMonth(w){
 function renderRibbon(w){
   const byDay=sessionsByDay();
   const keys=Object.keys(byDay).sort().reverse();
-  let h='<p class="lead">Every session day, newest first. Each column is one note — scan down: a steady color means that tone reads the same over time; a shift means it drifted. Tap a cell to open that note.</p>';
+  let h='<p class="lead">Every session day, newest first. Each column is one note. Scan down: a steady color means that tone reads the same over time; a shift means it drifted. Tap a cell to open that note.</p>';
   h+='<div class="rib-wrap"><div class="rib">';
   h+='<div class="corner">date</div>'+NOTES.map(N=>`<div class="h">${N.n}</div>`).join('');
   keys.forEach(k=>{
@@ -890,7 +895,7 @@ function openDay(k,list){
     NOTES.forEach(N=>{
       const card=document.createElement('div');card.className='gcard';
       const stage=document.createElement('div');stage.className='gstage';const vis=document.createElement('div');stage.appendChild(vis);card.appendChild(stage);
-      const meta=document.createElement('div');meta.className='gmeta';meta.innerHTML=`<span class="gn">${N.n}</span><span class="gd">${s.resp[N.n]?escapeHtml(s.resp[N.n].shape):'—'}</span>`;card.appendChild(meta);
+      const meta=document.createElement('div');meta.className='gmeta';meta.innerHTML=`<span class="gn">${N.n}</span><span class="gd">${s.resp[N.n]?escapeHtml(s.resp[N.n].shape):'\u00b7'}</span>`;card.appendChild(meta);
       grid.appendChild(card);
       if(s.resp[N.n]){renderVisual(vis,s.resp[N.n],0.9);card.onclick=()=>{closeOverlay('dayOverlay');openNote(N.n);};}
       else stage.innerHTML='<span style="color:var(--faint);font-size:11px">not captured</span>';
@@ -904,14 +909,14 @@ function openDay(k,list){
 function verdict(pct){
   if(pct>=85)return{label:'Strikingly consistent',short:'rock solid',color:'#7be0a4'};
   if(pct>=70)return{label:'Fairly consistent',short:'holding',color:'#e9b85a'};
-  if(pct>=50)return{label:'Mixed — some notes drift',short:'mixed',color:'#e9955a'};
+  if(pct>=50)return{label:'Mixed, some notes drift',short:'mixed',color:'#e9955a'};
   return{label:'Quite variable so far',short:'shifting',color:'#e07b7b'};
 }
 function renderInsights(){
   const w=document.getElementById('consWrap');
   if(sessions.length<2){
     w.innerHTML=`<div class="empty"><div class="big">Need a second session</div>You've done ${sessions.length} of 2. Come back on another day, capture the notes again <i>without peeking here</i>, and this measures how closely the two line up.</div>
-    <div class="note-research"><b>Why the wait matters.</b> Anyone can repeat themselves five minutes later. Genuine synesthesia shows up as agreement across days, weeks, even months — that durability is the signal researchers look for.</div>`;
+    <div class="note-research"><b>Why the wait matters.</b> Anyone can repeat themselves five minutes later. Genuine synesthesia shows up as agreement across days, weeks, even months. That durability is the signal researchers look for.</div>`;
     if(sessions.length===1)renderSessionList(w);
     renderFriendsSection(w);return;
   }
@@ -932,7 +937,7 @@ function renderInsights(){
       html+=`<div class="cscore"><div class="pct" style="color:${vv.color}">${pc}%</div><div class="word">${vv.short}</div></div><span class="chev">&#8250;</span></div>`;}
   });
   html+='</div>';
-  html+=`<div class="note-research"><b>Reading this.</b> The score blends how close your color is plus whether shape, motion and light matched. Real synesthesia tends to land high even with days between sessions. A low score isn't failure — a note can shift with mood, or just be less fixed than others. Tap any row to see it up close.</div>`;
+  html+=`<div class="note-research"><b>Reading this.</b> The score blends how close your color is plus whether shape, motion and light matched. Real synesthesia tends to land high even with days between sessions. A low score isn't failure. A note can shift with mood, or just be less fixed than others. Tap any row to see it up close.</div>`;
   w.innerHTML=html;
   perNote.forEach(p=>{const host=document.getElementById('th-'+p.note);
     p.specs.slice(-4).forEach(spec=>{const t=document.createElement('div');t.className='cthumb';const inner=document.createElement('div');t.appendChild(inner);host.appendChild(t);renderVisual(inner,spec,0.34);});});
@@ -1047,7 +1052,7 @@ async function handleImportFile(f){
     } else {
       const have=new Set(sessions.map(s=>s.id));
       const added=incoming.filter(s=>s&&s.id&&!have.has(s.id));
-      if(added.length===0){alert('Nothing new — those sessions are already here.');return;}
+      if(added.length===0){alert('Nothing new. Those sessions are already here.');return;}
       sessions=sessions.concat(added).sort((a,b)=>new Date(a.date)-new Date(b.date));
       await storage.save();refreshIntro();toast('Imported '+added.length+' session'+(added.length>1?'s':'')+'.');
       if(document.getElementById('v-gallery').classList.contains('on'))renderGallery();
@@ -1135,9 +1140,10 @@ function renderGuide(){const card=GUIDE[gIdx];
   document.getElementById('obBack').style.visibility=gIdx===0?'hidden':'visible';
   document.getElementById('obNext').textContent=gIdx===GUIDE.length-1?'Start':'Next';
 }
-async function guideNext(){if(gIdx<GUIDE.length-1){gIdx++;renderGuide();document.getElementById('onboard').scrollTo({top:0});}else{meta.onboarded=true;await storage.saveMeta();closeOverlay('onboard');}}
+async function guideNext(){if(gIdx<GUIDE.length-1){gIdx++;renderGuide();document.getElementById('onboard').scrollTo({top:0});}else{await finishGuide();}}
 function guideBack(){if(gIdx>0){gIdx--;renderGuide();document.getElementById('onboard').scrollTo({top:0});}}
-async function guideSkip(){meta.onboarded=true;await storage.saveMeta();closeOverlay('onboard');}
+async function finishGuide(){meta.onboarded=true;meta.guideBuild=BUILD;await storage.saveMeta();closeOverlay('onboard');}
+async function guideSkip(){await finishGuide();}
 
 /* ================= overlays / toast ================= */
 function showOverlay(id){document.getElementById(id).classList.add('on');}
@@ -1180,6 +1186,7 @@ document.getElementById('exportBtn').onclick=exportData;
 document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(f)handleImportFile(f);e.target.value='';};
 document.getElementById('helpBtn').onclick=showGuide;
+document.getElementById('tourBtn').onclick=showGuide;
 
 document.getElementById('ndClose').onclick=()=>closeOverlay('noteDetail');
 document.getElementById('ndPlay').onclick=()=>{playNote(FREQ[ndNote],document.getElementById('ndPlay'));ripple(document.querySelector('#noteDetail .nd-stage'));};
@@ -1219,7 +1226,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
   if(navigator.storage&&navigator.storage.persist){try{await navigator.storage.persist();}catch(e){}}
   await storage.load();
   refreshIntro();
-  if(!meta.onboarded)showGuide();
+  if(meta.guideBuild!==BUILD)showGuide();
   checkForUpdate();
 })();
 </script>

@@ -24,7 +24,8 @@ IMPORTANT
   the app shows a banner and pushes an Export so nothing is lost.
 
 WHAT'S NEW IN v2
-  - Guided tour (the "?" button): 8 visual steps explaining every feature
+  - Guided tour: auto-runs on first open and once after each update; reopen
+    anytime from the labeled Guide button or the home-screen tour link
   - Storage-safety banner, build stamp, self-update check
   - Session-complete reveal moment
   - Note Detail: Latest / Overlay (all captures fused) / Timeline (vs first)
@@ -35,4 +36,4 @@ WHAT'S NEW IN v2
     the note's color, drifting dust, a resonance ripple on each play
 
 Your v1 sessions are untouched — the data format is unchanged.
-Build: v2.2 · Aug 9
+Build: v2.3 · Aug 9
