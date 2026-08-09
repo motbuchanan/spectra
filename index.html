@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="build" content="v2.1 · Aug 9" />
+<meta name="build" content="v2.2 · Aug 9" />
 <title>Spectra — Sound You Can See</title>
 <link rel="manifest" href="./manifest.webmanifest" />
 <meta name="theme-color" content="#08080b" />
@@ -186,16 +186,57 @@
   .ov-close:active{transform:scale(.94);}
   .ov-body{flex:1;padding:2px 18px 40px;max-width:560px;margin:0 auto;width:100%;}
 
-  /* onboarding */
+  /* onboarding / guide */
   #onboard{justify-content:center;}
-  .ob-card{max-width:430px;margin:auto;text-align:center;padding:20px 26px;}
-  .ob-glyph{height:150px;position:relative;margin:0 auto 20px;overflow:hidden;pointer-events:none;}
-  .ob-title{font-family:var(--serif);font-size:27px;margin:0 0 12px;line-height:1.1;}
-  .ob-text{font-size:14.5px;color:var(--muted);line-height:1.62;}
+  .ob-card{max-width:442px;margin:auto;text-align:center;padding:16px 24px;}
+  .ob-hero{height:172px;position:relative;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;}
+  .ob-hero>*{width:100%;}
+  .ob-glyphlabel{position:absolute;top:8px;left:0;right:0;text-align:center;font-family:var(--serif);font-size:34px;color:rgba(210,222,255,.09);text-shadow:0 0 30px rgba(150,180,255,.14);z-index:1;pointer-events:none;}
+  .ob-title{font-family:var(--serif);font-size:25px;margin:0 0 10px;line-height:1.12;}
+  .ob-text{font-size:14px;color:var(--muted);line-height:1.6;min-height:70px;}
   .ob-text b{color:var(--ink);font-weight:600;}
-  .ob-dots{display:flex;gap:7px;justify-content:center;margin:24px 0;}
-  .ob-dots span{width:7px;height:7px;border-radius:50%;background:var(--line);}
-  .ob-dots span.on{background:var(--gold);}
+  .ob-dots{display:flex;gap:6px;justify-content:center;margin:16px 0;}
+  .ob-dots span{width:6px;height:6px;border-radius:50%;background:var(--line);transition:.2s;}
+  .ob-dots span.on{background:var(--gold);width:18px;border-radius:3px;}
+  .ob-nav{display:flex;gap:10px;}
+  .ob-nav .btn-primary{margin-top:0;flex:1;}
+  .ob-back{margin-top:0;flex:0 0 32%;}
+  .ob-skip{background:none;border:none;color:var(--faint);font-size:12.5px;margin-top:14px;cursor:pointer;text-decoration:underline;}
+  .ob-stage{position:relative;height:150px;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+    background:radial-gradient(130% 100% at 50% 44%, transparent 40%, rgba(3,3,6,.92) 100%),radial-gradient(78% 66% at 50% 39%, #12121c 0%, #08080d 55%, #030305 100%);
+    box-shadow:inset 0 1px 0 rgba(200,215,255,.05),inset 0 24px 50px -30px rgba(150,180,255,.07),inset 0 -40px 70px -24px rgba(0,0,0,.78);
+    display:flex;align-items:center;justify-content:center;}
+  .ob-pills{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+  .ob-pills span{font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 10px;}
+  .ob-spectrum{display:flex;gap:6px;justify-content:center;align-items:center;height:172px;}
+  .ob-cell{width:36px;height:66px;border-radius:9px;border:1px solid var(--line);position:relative;overflow:hidden;background:#060608;}
+  .ob-cn{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--serif);font-size:11px;color:rgba(255,255,255,.5);z-index:2;}
+  .ob-pair{display:flex;gap:10px;}
+  .ob-pair .ob-stage{height:134px;flex:1;}
+  .ob-paircol{flex:1;}
+  .ob-pairlbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:6px;}
+  .ob-ribwrap{display:grid;grid-template-columns:38px repeat(7,1fr);gap:3px;align-items:center;}
+  .ob-rlbl{font-size:9.5px;color:var(--muted);text-align:left;}
+  .ob-rhead{font-family:var(--serif);font-size:12px;color:var(--faint);text-align:center;}
+  .ob-rc{height:28px;border-radius:5px;}
+  .ob-pctwrap{padding:16px 0;}
+  .ob-pct{font-family:var(--serif);font-size:58px;line-height:1;color:var(--gold);}
+  .ob-pct small{font-size:22px;color:var(--gold-dim);}
+  .ob-pctlbl{font-size:12px;color:var(--muted);margin-top:6px;}
+  .ob-pctv{font-family:var(--serif);font-size:16px;color:#7be0a4;margin-top:10px;}
+  .ob-share{display:flex;gap:10px;height:172px;}
+  .ob-sharebox{flex:1;border:1px solid var(--line);border-radius:14px;background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+  .ob-play{width:54px;height:54px;border-radius:50%;background:rgba(233,184,90,.13);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;}
+  .ob-play .tri{width:0;height:0;border-left:14px solid var(--gold);border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px;}
+  .ob-sharelbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+  .ob-cmpgrid{display:flex;flex-direction:column;gap:5px;}
+  .ob-cmprow{display:flex;gap:5px;}
+  .ob-cmprow div{width:30px;height:16px;border-radius:4px;}
+  .ob-return{display:flex;align-items:center;gap:8px;justify-content:center;}
+  .ob-return .ob-stage{height:120px;}
+  .ob-day{flex:1;text-align:center;}
+  .ob-daylbl{font-size:10.5px;color:var(--muted);margin-top:6px;}
+  .ob-arrow{color:var(--gold);font-size:22px;flex:0 0 auto;}
 
   /* segmented */
   .seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;margin:6px 0 16px;}
@@ -212,11 +253,11 @@
     display:flex;align-items:center;justify-content:center;}
 
   /* ===== deep-space treatment (capture + note-detail stages) ===== */
-  .stage::before, .nd-stage::before{content:"";position:absolute;inset:-12%;z-index:0;pointer-events:none;
+  .stage::before, .nd-stage::before, .ob-stage::before{content:"";position:absolute;inset:-12%;z-index:0;pointer-events:none;
     background:radial-gradient(circle at 50% 45%, var(--nc,#4a78c8) 0%, transparent 58%);
     opacity:.26;filter:blur(30px);animation:breathe 7.5s ease-in-out infinite;}
   @keyframes breathe{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.32;transform:scale(1.07)}}
-  .stage > *, .nd-stage > *{position:relative;z-index:1;}
+  .stage > *, .nd-stage > *, .ob-stage > *{position:relative;z-index:1;}
   .sp-dust{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;}
   .stage > .sp-dust, .nd-stage > .sp-dust{z-index:0;}
   .sp-dust.d1{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='210'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='24' cy='34' r='1.3' opacity='.55'/%3E%3Ccircle cx='150' cy='58' r='.9' opacity='.4'/%3E%3Ccircle cx='86' cy='128' r='1.7' opacity='.45'/%3E%3Ccircle cx='182' cy='158' r='1' opacity='.35'/%3E%3Ccircle cx='54' cy='182' r='.8' opacity='.35'/%3E%3Ccircle cx='120' cy='22' r='.7' opacity='.3'/%3E%3C/g%3E%3C/svg%3E");background-size:210px 210px;opacity:.5;animation:drift1 46s linear infinite;}
@@ -395,15 +436,18 @@
 <div id="buildStamp"><span id="stampText"></span></div>
 <div id="toast"></div>
 
-<!-- ONBOARDING -->
+<!-- GUIDE -->
 <div class="overlay" id="onboard">
   <div class="ob-card">
-    <div class="ob-glyph" id="obGlyph"></div>
+    <div class="ob-hero" id="obHero"></div>
     <h2 class="ob-title" id="obTitle"></h2>
     <p class="ob-text" id="obText"></p>
     <div class="ob-dots" id="obDots"></div>
-    <button class="btn-primary" id="obNext">Next</button>
-    <button class="btn-ghost" id="obSkip">Skip</button>
+    <div class="ob-nav">
+      <button class="btn-ghost ob-back" id="obBack">Back</button>
+      <button class="btn-primary" id="obNext">Next</button>
+    </div>
+    <button class="ob-skip" id="obSkip">Skip the tour</button>
   </div>
 </div>
 
@@ -1012,26 +1056,88 @@ async function handleImportFile(f){
   r.readAsText(f);
 }
 
-/* ================= onboarding ================= */
-const OB=[
-  {title:'You see sound. This maps it.',text:'Spectra plays clean notes and lets you build what you see for each one — color, shape, movement, light. No music knowledge needed.'},
-  {title:'Build what you see.',text:'Pick a color, a form, how it moves, how it\u2019s lit. A live preview animates as you choose, so you can tune it until it <b>matches the feeling</b>.'},
-  {title:'The real test is time.',text:'Come back on other days and capture again — blind. <b>Calendar</b> and <b>Insights</b> then show whether your sound holds. Consistency across days is exactly how researchers verify synesthesia.'}
+/* ================= guide ================= */
+function heroStage(h,spec,glyph){h.innerHTML='';const st=document.createElement('div');st.className='ob-stage';
+  if(glyph){const g=document.createElement('div');g.className='ob-glyphlabel';g.textContent=glyph;st.appendChild(g);}
+  const vis=document.createElement('div');st.appendChild(vis);h.appendChild(st);renderVisual(vis,spec,0.7);setNoteColor(st,spec.color);}
+function heroDims(h){h.innerHTML='';const wrap=document.createElement('div');
+  const st=document.createElement('div');st.className='ob-stage';const vis=document.createElement('div');st.appendChild(vis);wrap.appendChild(st);
+  renderVisual(vis,{color:'#e9b85a',shape:'Star',moves:['Spin'],lights:['Sparkle'],size:58},0.7);setNoteColor(st,'#e9b85a');
+  const row=document.createElement('div');row.className='ob-pills';['Color','Shape','Movement','Light'].forEach(t=>{const s=document.createElement('span');s.textContent=t;row.appendChild(s);});
+  wrap.appendChild(row);h.appendChild(wrap);}
+const DEMO_COLORS={C:'#ff5544',D:'#4a86ff',E:'#38c172',F:'#54c8ff',G:'#e9b85a',A:'#1f7a4d',B:'#3a5bd0'};
+function heroSpectrum(h){h.innerHTML='';const row=document.createElement('div');row.className='ob-spectrum';
+  NOTES.forEach(N=>{const cell=document.createElement('div');cell.className='ob-cell';const vis=document.createElement('div');cell.appendChild(vis);
+    const lab=document.createElement('div');lab.className='ob-cn';lab.textContent=N.n;cell.appendChild(lab);row.appendChild(cell);
+    renderVisual(vis,{color:DEMO_COLORS[N.n],shape:'Orb',lights:['Glow'],size:30},0.5);});
+  h.appendChild(row);}
+function heroPair(h){h.innerHTML='';const row=document.createElement('div');row.className='ob-pair';
+  const col=(label,build)=>{const c=document.createElement('div');c.className='ob-paircol';const st=document.createElement('div');st.className='ob-stage';build(st);
+    const l=document.createElement('div');l.className='ob-pairlbl';l.textContent=label;c.appendChild(st);c.appendChild(l);return c;};
+  row.appendChild(col('steady',st=>{const v=document.createElement('div');st.appendChild(v);renderVisual(v,{color:'#ff5544',shape:'Orb',lights:['Glow'],size:50},0.6);setNoteColor(st,'#ff5544');}));
+  row.appendChild(col('drifting',st=>{[['#22dd88','Star'],['#8822dd','Wave'],['#dddd22','Blob']].forEach(([c,s])=>{const v=document.createElement('div');st.appendChild(v);
+    renderVisual(v,{color:c,shape:s,lights:['Glow'],size:48},0.55);v.style.opacity=0.5;v.style.mixBlendMode='screen';});setNoteColor(st,'#8822dd');}));
+  h.appendChild(row);}
+function heroRibbon(h){h.innerHTML='';const wrap=document.createElement('div');wrap.className='ob-ribwrap';
+  const corner=document.createElement('div');wrap.appendChild(corner);
+  NOTES.forEach(N=>{const hd=document.createElement('div');hd.className='ob-rhead';hd.textContent=N.n;wrap.appendChild(hd);});
+  const gdrift=['#e9b85a','#8822dd','#22dd88'];
+  ['Aug 9','Aug 7','Aug 5'].forEach((d,ri)=>{const lb=document.createElement('div');lb.className='ob-rlbl';lb.textContent=d;wrap.appendChild(lb);
+    NOTES.forEach(N=>{const c=document.createElement('div');c.className='ob-rc';c.style.background=N.n==='G'?gdrift[ri]:DEMO_COLORS[N.n];wrap.appendChild(c);});});
+  h.appendChild(wrap);}
+function heroPct(h){h.innerHTML='';const w=document.createElement('div');w.className='ob-pctwrap';
+  w.innerHTML='<div class="ob-pct">87<small>%</small></div><div class="ob-pctlbl">consistency across your sessions</div><div class="ob-pctv">Strikingly consistent</div>';h.appendChild(w);}
+function heroShare(h){h.innerHTML='';const row=document.createElement('div');row.className='ob-share';
+  const mel=document.createElement('div');mel.className='ob-sharebox';mel.innerHTML='<div class="ob-play"><span class="tri"></span></div><div class="ob-sharelbl">Melody</div>';
+  const cmp=document.createElement('div');cmp.className='ob-sharebox';const mine=['#ff5544','#4a86ff','#38c172'],fr=['#ff6a4d','#3a7bff','#2fbf6a'];
+  let g='<div class="ob-cmpgrid">';for(let i=0;i<3;i++)g+=`<div class="ob-cmprow"><div style="background:${mine[i]}"></div><div style="background:${fr[i]}"></div></div>`;
+  g+='</div><div class="ob-sharelbl">You vs friend</div>';cmp.innerHTML=g;row.appendChild(mel);row.appendChild(cmp);h.appendChild(row);}
+function heroReturn(h){h.innerHTML='';const row=document.createElement('div');row.className='ob-return';
+  const day=lbl=>{const d=document.createElement('div');d.className='ob-day';const st=document.createElement('div');st.className='ob-stage';const v=document.createElement('div');st.appendChild(v);
+    renderVisual(v,{color:'#54c8ff',shape:'Orb',moves:['Pulse'],lights:['Glow'],size:44},0.55);setNoteColor(st,'#54c8ff');
+    const l=document.createElement('div');l.className='ob-daylbl';l.textContent=lbl;d.appendChild(st);d.appendChild(l);return d;};
+  row.appendChild(day('Today'));const ar=document.createElement('div');ar.className='ob-arrow';ar.textContent='\u2192';row.appendChild(ar);row.appendChild(day('Another day'));
+  h.appendChild(row);}
+
+const GUIDE=[
+  {t:'You see sound. This maps it.',
+   x:"Some people get a flash of color, shape or motion when they hear a tone. Spectra lets you capture that, then checks whether it stays the same over time.",
+   hero:h=>heroStage(h,{color:'#54c8ff',color2:'#b06cff',shape:'Orb',moves:['Pulse'],lights:['Glow'],size:74},'B')},
+  {t:'Build what you hear.',
+   x:"Press Start and it plays the seven natural notes in random order. For each one you set four things, and a live preview animates as you go so you can match the feeling.",
+   hero:heroDims},
+  {t:'Your whole spectrum, at once.',
+   x:"Finish a session and all seven notes reveal together. They live in the <b>Notes</b> tab, where you can hear and see any of them again.",
+   hero:heroSpectrum},
+  {t:'Is that note always that color?',
+   x:"Tap any note to open it. <b>Overlay</b> stacks every capture: a steady note fuses into one clean shape, a drifting one blurs. <b>Timeline</b> scores each try against your first.",
+   hero:heroPair},
+  {t:'Watch it over days.',
+   x:"<b>Calendar</b> gives each day a seven-note spectrum. <b>Ribbons</b> lines your days up in columns, so a note that shifts breaks the stripe. Here, G wanders while the rest hold.",
+   hero:heroRibbon},
+  {t:'A score for how well it holds.',
+   x:"<b>Insights</b> blends color, shape, motion and light into one number. Landing high with days in between is the real signal researchers look for.",
+   hero:heroPct},
+  {t:'Play it, and share it.',
+   x:"<b>Melody</b> plays simple tunes using your own visuals. <b>Export</b> your spectrum to a file, and a friend can import it to compare theirs against yours.",
+   hero:heroShare},
+  {t:'One rule: come back blind.',
+   x:"The test only works if you do another session on a different day <b>without looking back here first</b>. Capture fresh, then let Insights compare. That is the whole thing.",
+   hero:heroReturn}
 ];
-let obIdx=0;
-function obGlyphSpec(i){return [{color:'#76c7ff',color2:'#bb6cff',shape:'Orb',moves:['Pulse'],lights:['Glow'],size:70},
-  {color:'#e9b85a',shape:'Star',moves:['Spin'],lights:['Sparkle'],size:64},
-  {color:'#7be0a4',color2:'#76c7ff',shape:'Field',moves:['Expand'],lights:['Glow'],size:60}][i];}
-function showOnboarding(){obIdx=0;renderOB();showOverlay('onboard');}
-function renderOB(){
-  document.getElementById('obTitle').textContent=OB[obIdx].title;
-  document.getElementById('obText').innerHTML=OB[obIdx].text;
-  renderStage(document.getElementById('obGlyph'),obGlyphSpec(obIdx),1);
-  document.getElementById('obDots').innerHTML=OB.map((_,i)=>`<span class="${i===obIdx?'on':''}"></span>`).join('');
-  document.getElementById('obNext').textContent=obIdx===OB.length-1?'Start':'Next';
+let gIdx=0;
+function showGuide(){gIdx=0;renderGuide();showOverlay('onboard');}
+function renderGuide(){const card=GUIDE[gIdx];
+  document.getElementById('obTitle').textContent=card.t;
+  document.getElementById('obText').innerHTML=card.x;
+  card.hero(document.getElementById('obHero'));
+  document.getElementById('obDots').innerHTML=GUIDE.map((_,i)=>`<span class="${i===gIdx?'on':''}"></span>`).join('');
+  document.getElementById('obBack').style.visibility=gIdx===0?'hidden':'visible';
+  document.getElementById('obNext').textContent=gIdx===GUIDE.length-1?'Start':'Next';
 }
-async function obNext(){if(obIdx<OB.length-1){obIdx++;renderOB();}else{meta.onboarded=true;await storage.saveMeta();closeOverlay('onboard');}}
-async function obSkip(){meta.onboarded=true;await storage.saveMeta();closeOverlay('onboard');}
+async function guideNext(){if(gIdx<GUIDE.length-1){gIdx++;renderGuide();document.getElementById('onboard').scrollTo({top:0});}else{meta.onboarded=true;await storage.saveMeta();closeOverlay('onboard');}}
+function guideBack(){if(gIdx>0){gIdx--;renderGuide();document.getElementById('onboard').scrollTo({top:0});}}
+async function guideSkip(){meta.onboarded=true;await storage.saveMeta();closeOverlay('onboard');}
 
 /* ================= overlays / toast ================= */
 function showOverlay(id){document.getElementById(id).classList.add('on');}
@@ -1073,7 +1179,7 @@ document.getElementById('sizeR').oninput=e=>{draft.spec.size=+e.target.value;upd
 document.getElementById('exportBtn').onclick=exportData;
 document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(f)handleImportFile(f);e.target.value='';};
-document.getElementById('helpBtn').onclick=showOnboarding;
+document.getElementById('helpBtn').onclick=showGuide;
 
 document.getElementById('ndClose').onclick=()=>closeOverlay('noteDetail');
 document.getElementById('ndPlay').onclick=()=>{playNote(FREQ[ndNote],document.getElementById('ndPlay'));ripple(document.querySelector('#noteDetail .nd-stage'));};
@@ -1085,8 +1191,9 @@ document.getElementById('ndPlay').onclick=()=>{playNote(FREQ[ndNote],document.ge
 
 document.getElementById('melClose').onclick=()=>closeOverlay('melody');
 document.getElementById('fcClose').onclick=()=>closeOverlay('friendCmp');
-document.getElementById('obNext').onclick=obNext;
-document.getElementById('obSkip').onclick=obSkip;
+document.getElementById('obNext').onclick=guideNext;
+document.getElementById('obSkip').onclick=guideSkip;
+document.getElementById('obBack').onclick=guideBack;
 document.getElementById('cxSee').onclick=()=>{closeOverlay('complete');switchView('gallery');};
 
 document.getElementById('stampText').onclick=()=>toast('Spectra '+BUILD);
@@ -1112,7 +1219,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
   if(navigator.storage&&navigator.storage.persist){try{await navigator.storage.persist();}catch(e){}}
   await storage.load();
   refreshIntro();
-  if(!meta.onboarded)showOnboarding();
+  if(!meta.onboarded)showGuide();
   checkForUpdate();
 })();
 </script>

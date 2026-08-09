@@ -24,7 +24,8 @@ IMPORTANT
   the app shows a banner and pushes an Export so nothing is lost.
 
 WHAT'S NEW IN v2
-  - Onboarding, storage-safety banner, build stamp, self-update check
+  - Guided tour (the "?" button): 8 visual steps explaining every feature
+  - Storage-safety banner, build stamp, self-update check
   - Session-complete reveal moment
   - Note Detail: Latest / Overlay (all captures fused) / Timeline (vs first)
   - Calendar: Month spectrum grid + Ribbons (scan columns for drift)
@@ -34,4 +35,4 @@ WHAT'S NEW IN v2
     the note's color, drifting dust, a resonance ripple on each play
 
 Your v1 sessions are untouched — the data format is unchanged.
-Build: v2.1 · Aug 9
+Build: v2.2 · Aug 9
