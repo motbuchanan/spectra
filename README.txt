@@ -30,6 +30,8 @@ WHAT'S NEW IN v2
   - Calendar: Month spectrum grid + Ribbons (scan columns for drift)
   - Melody mode (your visuals fire in rhythm)
   - Friend Compare (export/import an envelope, compare spectrums side by side)
+  - v2.1: deep "mind-space" capture + note stages — the space lights up with
+    the note's color, drifting dust, a resonance ripple on each play
 
 Your v1 sessions are untouched — the data format is unchanged.
-Build: v2.0 · Aug 9
+Build: v2.1 · Aug 9

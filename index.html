@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="build" content="v2.0 · Aug 9" />
+<meta name="build" content="v2.1 · Aug 9" />
 <title>Spectra — Sound You Can See</title>
 <link rel="manifest" href="./manifest.webmanifest" />
 <meta name="theme-color" content="#08080b" />
@@ -74,11 +74,14 @@
   .pdots span{width:7px;height:7px;border-radius:50%;background:var(--line);}
   .pdots span.done{background:var(--gold-dim);}
   .pdots span.cur{background:var(--gold);box-shadow:0 0 8px var(--gold);}
-  .stage{position:relative;height:230px;border-radius:20px;overflow:hidden;
-    background:radial-gradient(70% 70% at 50% 45%, #0d0d12 0%, #050507 100%);
-    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+  .stage{position:relative;height:250px;border-radius:22px;overflow:hidden;border:1px solid var(--line);
+    background:
+      radial-gradient(130% 100% at 50% 44%, transparent 40%, rgba(3,3,6,.92) 100%),
+      radial-gradient(78% 66% at 50% 39%, #12121c 0%, #08080d 55%, #030305 100%);
+    box-shadow: inset 0 1px 0 rgba(200,215,255,.05), inset 0 34px 70px -34px rgba(150,180,255,.07), inset 0 -55px 95px -30px rgba(0,0,0,.78);
+    display:flex;align-items:center;justify-content:center;}
   .noteglyph{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--serif);
-    font-size:46px;color:rgba(255,255,255,.07);font-weight:500;pointer-events:none;user-select:none;}
+    font-size:46px;color:rgba(210,222,255,.09);font-weight:500;pointer-events:none;user-select:none;text-shadow:0 0 34px rgba(150,180,255,.14);}
   .playbtn{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
     background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink);
     font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.5px;padding:9px 18px;border-radius:22px;
@@ -201,8 +204,29 @@
 
   /* note detail */
   .nd-note{font-family:var(--serif);font-size:38px;line-height:1;}
-  .nd-stage{position:relative;height:300px;border-radius:20px;overflow:hidden;border:1px solid var(--line);
-    background:radial-gradient(70% 70% at 50% 45%,#0d0d12,#050507);display:flex;align-items:center;justify-content:center;}
+  .nd-stage{position:relative;height:320px;border-radius:22px;overflow:hidden;border:1px solid var(--line);
+    background:
+      radial-gradient(130% 100% at 50% 44%, transparent 40%, rgba(3,3,6,.92) 100%),
+      radial-gradient(78% 66% at 50% 39%, #12121c 0%, #08080d 55%, #030305 100%);
+    box-shadow: inset 0 1px 0 rgba(200,215,255,.05), inset 0 34px 70px -34px rgba(150,180,255,.07), inset 0 -55px 95px -30px rgba(0,0,0,.78);
+    display:flex;align-items:center;justify-content:center;}
+
+  /* ===== deep-space treatment (capture + note-detail stages) ===== */
+  .stage::before, .nd-stage::before{content:"";position:absolute;inset:-12%;z-index:0;pointer-events:none;
+    background:radial-gradient(circle at 50% 45%, var(--nc,#4a78c8) 0%, transparent 58%);
+    opacity:.26;filter:blur(30px);animation:breathe 7.5s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.32;transform:scale(1.07)}}
+  .stage > *, .nd-stage > *{position:relative;z-index:1;}
+  .sp-dust{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;}
+  .stage > .sp-dust, .nd-stage > .sp-dust{z-index:0;}
+  .sp-dust.d1{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='210'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='24' cy='34' r='1.3' opacity='.55'/%3E%3Ccircle cx='150' cy='58' r='.9' opacity='.4'/%3E%3Ccircle cx='86' cy='128' r='1.7' opacity='.45'/%3E%3Ccircle cx='182' cy='158' r='1' opacity='.35'/%3E%3Ccircle cx='54' cy='182' r='.8' opacity='.35'/%3E%3Ccircle cx='120' cy='22' r='.7' opacity='.3'/%3E%3C/g%3E%3C/svg%3E");background-size:210px 210px;opacity:.5;animation:drift1 46s linear infinite;}
+  .sp-dust.d2{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cg fill='%23cfe0ff'%3E%3Ccircle cx='30' cy='40' r='.7' opacity='.4'/%3E%3Ccircle cx='110' cy='30' r='.6' opacity='.3'/%3E%3Ccircle cx='70' cy='96' r='.9' opacity='.35'/%3E%3Ccircle cx='130' cy='120' r='.6' opacity='.28'/%3E%3Ccircle cx='16' cy='128' r='.7' opacity='.3'/%3E%3C/g%3E%3C/svg%3E");background-size:150px 150px;opacity:.34;animation:drift2 28s linear infinite;}
+  @keyframes drift1{from{background-position:0 0}to{background-position:210px -168px}}
+  @keyframes drift2{from{background-position:0 0}to{background-position:-150px 130px}}
+  .sp-ripple{position:absolute;left:50%;top:45%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;
+    border:2px solid var(--nc,#4a78c8);z-index:1;pointer-events:none;opacity:.6;}
+  @keyframes ripple{to{transform:scale(6.5);opacity:0}}
+  @media (prefers-reduced-motion: reduce){.sp-dust,.stage::before,.nd-stage::before{animation:none}}
   .nd-hint{font-size:12px;color:var(--faint);text-align:center;margin:12px 0 0;line-height:1.5;}
   .nd-foot{display:flex;justify-content:space-between;margin-top:14px;font-size:12.5px;color:var(--muted);}
   .nd-foot b{color:var(--ink);}
@@ -566,6 +590,13 @@ function renderVisual(container,spec,scale){
 // render into a positioned host WITHOUT clobbering the host's own box (visual fills an inner child)
 function renderStage(host,spec,scale){host.innerHTML='';const inner=document.createElement('div');host.appendChild(inner);renderVisual(inner,spec,scale);}
 
+// deep-space: drifting dust motes + a ripple that pushes out when a note sounds
+function mountDust(stage){if(!stage||stage.querySelector('.sp-dust'))return;
+  ['d2','d1'].forEach(cls=>{const d=document.createElement('div');d.className='sp-dust '+cls;stage.insertBefore(d,stage.firstChild);});}
+function setNoteColor(stage,color){if(stage&&color)stage.style.setProperty('--nc',color);}
+function ripple(stage){if(!stage||REDUCE)return;const r=document.createElement('div');r.className='sp-ripple';
+  r.style.animation='ripple 1.1s ease-out forwards';stage.appendChild(r);setTimeout(()=>r.remove(),1150);}
+
 /* ================= similarity ================= */
 function hexRgb(h){const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return m?{r:+('0x'+m[1]),g:+('0x'+m[2]),b:+('0x'+m[3])}:null;}
 function colorSim(a,b){const c1=hexRgb(a),c2=hexRgb(b);if(!c1||!c2)return a===b?1:0;
@@ -606,7 +637,7 @@ function syncChipSel(){
   [...document.getElementById('moveChips').children].forEach(c=>c.classList.toggle('sel',draft.spec.moves.includes(c.textContent)));
   [...document.getElementById('lightChips').children].forEach(c=>c.classList.toggle('sel',draft.spec.lights.includes(c.textContent)));
 }
-function updatePreview(){renderVisual(document.getElementById('capVisual'),draft.spec,1);document.getElementById('nextBtn').style.opacity=draft.spec.shape?1:0.45;}
+function updatePreview(){renderVisual(document.getElementById('capVisual'),draft.spec,1);setNoteColor(document.getElementById('capStage'),draft.spec.color);document.getElementById('nextBtn').style.opacity=draft.spec.shape?1:0.45;}
 function loadStep(){
   const note=draft.order[draft.idx];
   document.getElementById('capGlyph').textContent=note;
@@ -618,7 +649,7 @@ function loadStep(){
   document.getElementById('sizeR').value=draft.spec.size;document.getElementById('noteText').value='';
   syncChipSel();updatePreview();renderDots();
   document.getElementById('nextBtn').textContent = draft.idx===draft.order.length-1?'Finish session':'Save & next';
-  playNote(FREQ[note],document.getElementById('capPlay'));
+  playNote(FREQ[note],document.getElementById('capPlay'));ripple(document.getElementById('capStage'));
 }
 function renderDots(){const d=document.getElementById('pdots');d.innerHTML='';
   draft.order.forEach((_,i)=>{const s=document.createElement('span');if(i<draft.idx)s.className='done';if(i===draft.idx)s.className='cur';d.appendChild(s);});}
@@ -710,10 +741,11 @@ function renderND(){
     +(cons!=null?`<span>consistency <b style="color:${verdict(Math.round(cons*100)).color}">${Math.round(cons*100)}%</b></span>`:`<span style="color:var(--faint)">need 2+ to score</span>`);
   if(ndMode==='latest'){
     const stage=document.createElement('div');stage.className='nd-stage';const vis=document.createElement('div');
-    stage.appendChild(vis);c.appendChild(stage);renderVisual(vis,caps[caps.length-1].spec,1.15);
+    stage.appendChild(vis);c.appendChild(stage);renderVisual(vis,caps[caps.length-1].spec,1.15);setNoteColor(stage,caps[caps.length-1].spec.color);
     const h=document.createElement('div');h.className='nd-hint';h.textContent='Your most recent capture of '+ndNote+'.';c.appendChild(h);
   } else if(ndMode==='overlay'){
     const stage=document.createElement('div');stage.className='nd-stage';c.appendChild(stage);
+    setNoteColor(stage,caps[caps.length-1].spec.color);
     const n=caps.length;const op=Math.max(0.35,1/n);
     caps.forEach(cap=>{const box=document.createElement('div');stage.appendChild(box);renderVisual(box,cap.spec,1.05);
       box.style.opacity=op;box.style.mixBlendMode='screen';});
@@ -1025,7 +1057,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   switchView(b.dataset.v);
 });
 document.getElementById('startSess').onclick=()=>{ensureAudio();startSession();};
-document.getElementById('capPlay').onclick=()=>{if(draft)playNote(FREQ[draft.order[draft.idx]],document.getElementById('capPlay'));};
+document.getElementById('capPlay').onclick=()=>{if(draft){playNote(FREQ[draft.order[draft.idx]],document.getElementById('capPlay'));ripple(document.getElementById('capStage'));}};
 document.getElementById('nextBtn').onclick=saveStep;
 document.getElementById('cancelSess').onclick=()=>{draft=null;endFlowUI();refreshIntro();};
 document.getElementById('col1').oninput=e=>{draft.spec.color=e.target.value;updatePreview();};
@@ -1044,7 +1076,7 @@ document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(
 document.getElementById('helpBtn').onclick=showOnboarding;
 
 document.getElementById('ndClose').onclick=()=>closeOverlay('noteDetail');
-document.getElementById('ndPlay').onclick=()=>playNote(FREQ[ndNote],document.getElementById('ndPlay'));
+document.getElementById('ndPlay').onclick=()=>{playNote(FREQ[ndNote],document.getElementById('ndPlay'));ripple(document.querySelector('#noteDetail .nd-stage'));};
 [...document.getElementById('ndSeg').children].forEach(b=>b.onclick=()=>{ndMode=b.dataset.m;
   [...document.getElementById('ndSeg').children].forEach(x=>x.classList.toggle('on',x===b));renderND();});
 
@@ -1075,6 +1107,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 /* ================= boot ================= */
 (async function boot(){
   document.getElementById('stampText').textContent='Spectra '+BUILD;
+  mountDust(document.getElementById('capStage'));
   probeStorage();
   if(navigator.storage&&navigator.storage.persist){try{await navigator.storage.persist();}catch(e){}}
   await storage.load();
